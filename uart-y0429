@@ -1,0 +1,8 @@
+echo "# uart-y0429" >> README.md
+cd "G:\我的雲端硬碟\Python\UART"
+git init
+git add "UART Y0429.py"
+git commit -m "乾淨上傳：只包含 UART Y0429.py"
+git remote add origin https://github.com/edgarhsiao/uart-y0429.git
+git push -f origin main
+
