@@ -1,0 +1,48 @@
+name: Build and Release UART_Y0429
+
+on:
+  push:
+    tags:
+      - 'v*'  # 僅在推送 tag（如 v1.0.0）時觸發
+
+jobs:
+  build:
+    name: Build on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install PyInstaller
+        run: pip install pyinstaller
+
+      - name: Build executable
+        run: pyinstaller --name "UART_Y0429" --onefile "UART Y0429.py"
+
+      - name: Archive executable
+        shell: bash
+        run: |
+          cd dist
+          if [ "${{ runner.os }}" == "Windows" ]; then
+            powershell -Command "Compress-Archive -Path UART_Y0429.exe -DestinationPath ../UART_Y0429_Windows.zip"
+          else
+            tar -czvf ../UART_Y0429_Linux.tar.gz UART_Y0429
+          fi
+
+      - name: Upload release asset
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            UART_Y0429_Windows.zip
+            UART_Y0429_Linux.tar.gz
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
